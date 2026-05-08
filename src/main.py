@@ -3,7 +3,6 @@ import argparse
 import os
 import sys
 
-# Add project root to path if needed
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.detection import FaceDetector
@@ -26,8 +25,7 @@ def process_image(image_path, detector, recognizer, database, threshold=0.6):
         face_roi = img_rgb[y1:y2, x1:x2]
         if face_roi.size == 0:
             continue
-        # Recognizer expects BGR for ArcFace (DeepFace), but simple recognizer expects RGB.
-        # We'll convert inside each recognizer.
+      
         face_bgr = cv2.cvtColor(face_roi, cv2.COLOR_RGB2BGR)
         name, dist = recognizer.recognize(face_bgr, database, threshold)
         names.append(name)
@@ -86,16 +84,13 @@ def main():
                         help="Recognition threshold (lower = stricter)")
     args = parser.parse_args()
 
-    # Initialize face detector (OpenCV DNN)
     detector = FaceDetector()
 
-    # Initialize recognizer
     if args.recognizer == "arcface":
         recognizer = ArcFaceRecognizer()
     else:
         recognizer = SimpleRecognizer()
 
-    # Build database if dataset folder exists
     database = {}
     if os.path.exists(args.dataset) and os.path.isdir(args.dataset):
         print(f"Building database from {args.dataset} ...")
@@ -104,9 +99,8 @@ def main():
     else:
         print(f"Dataset folder '{args.dataset}' not found. Recognition will return 'unknown'.")
 
-    # Determine input type
     if args.input.isdigit():
-        source = int(args.input)   # webcam
+        source = int(args.input)   
         process_video(source, detector, recognizer, database, args.threshold)
     elif args.input.lower().endswith(('.mp4', '.avi', '.mov', '.mkv')):
         process_video(args.input, detector, recognizer, database, args.threshold)
