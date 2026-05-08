@@ -6,7 +6,6 @@ class SimpleRecognizer:
     @staticmethod
     def get_embedding(face_img_rgb):
         """face_img_rgb is RGB numpy array."""
-        # face_recognition expects RGB already
         encodings = face_recognition.face_encodings(face_img_rgb)
         if len(encodings) == 0:
             return None
@@ -38,7 +37,6 @@ class SimpleRecognizer:
         best_name = "unknown"
         best_dist = 1.0
         for name, db_emb in database.items():
-            # face_recognition uses face_distance (lower = better)
             dist = np.linalg.norm(emb - db_emb)
             if dist < best_dist and dist < threshold:
                 best_dist = dist
