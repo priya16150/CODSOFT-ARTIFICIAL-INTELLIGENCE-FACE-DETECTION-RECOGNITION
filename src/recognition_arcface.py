@@ -6,15 +6,13 @@ from deepface import DeepFace
 class ArcFaceRecognizer:
     def __init__(self, model_name='ArcFace', detector_backend='opencv'):
         self.model_name = model_name
-        self.detector_backend = detector_backend  # we already do detection ourselves, so we'll disable it
+        self.detector_backend = detector_backend 
         self.db_embeddings = {}
         self.db_path = None
 
     def get_embedding(self, face_img_bgr):
         """Extract embedding from a face image (BGR format)."""
-        # DeepFace expects RGB; convert if needed
         img_rgb = cv2.cvtColor(face_img_bgr, cv2.COLOR_BGR2RGB)
-        # enforce_detection=False because we already provide a cropped face
         embedding = DeepFace.represent(img_path=img_rgb, model_name=self.model_name,
                                        detector_backend='skip', enforce_detection=False)
         if embedding:
@@ -52,7 +50,6 @@ class ArcFaceRecognizer:
         best_name = "unknown"
         best_dist = 1.0
         for name, db_emb in self.db_embeddings.items():
-            # cosine distance: 1 - cosine_similarity
             cos_sim = np.dot(emb, db_emb) / (np.linalg.norm(emb) * np.linalg.norm(db_emb))
             dist = 1 - cos_sim
             if dist < best_dist and dist < threshold:
